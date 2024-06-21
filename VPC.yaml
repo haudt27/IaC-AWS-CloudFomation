@@ -3,7 +3,6 @@ AWSTemplateFormatVersion: 2010-09-09
 
 ## =================== DESCRIPTION =================== #
 Description: >-
-  AWS CloudFormation sample template. 
   Create a custom VPC with a pair of public and private subnets spread across two AZs
 
 ## =================== PARAMETERS =================== #
@@ -29,14 +28,13 @@ Parameters:
     Type: String
     Default: 10.192.21.0/24
   paramUniqueName:
-    Description: Give a unique name for "CloudFormationLab" tag value
     Type: String
     Default: haudt
 
 ## =================== RESOURCES =================== #
 Resources:
-  # ----------------  Step 1 ----------------
-  # a) Create a VPC
+
+ #Create a VPC
   myVPC:
     Type: AWS::EC2::VPC
     Properties:
@@ -47,7 +45,7 @@ Resources:
       - Key: MasteringCF
         Value:  !Ref paramUniqueName
 
-  # b) Create a Internet Gateway
+  #  Create a Internet Gateway
   myInternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
@@ -55,15 +53,15 @@ Resources:
       - Key: MasteringCF
         Value:  !Ref paramUniqueName
 
-  # c) Attach the Internet Gateway to the VPC
+  #  Attach the Internet Gateway to the VPC
   myVPCGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
       VpcId: !Ref myVPC
       InternetGatewayId: !Ref myInternetGateway
 
-  # ----------------  Step 2 ----------------
-  # a) Create a public route table for the VPC (will be public once it is associated with the Internet Gateway)
+ 
+  #  Create a public route table for the VPC (will be public once it is associated with the Internet Gateway)
   myPublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -81,7 +79,7 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref myInternetGateway
 
-  # c) Create a public subnet in AZ 1 (will be public once it is associated with public route table)
+  #  Create a public subnet in AZ 1 (will be public once it is associated with public route table)
   myPublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
@@ -105,7 +103,7 @@ Resources:
       - Key: MasteringCF
         Value:  !Ref paramUniqueName
 
-  # d) Associate the public route table with the public subnet in AZ 1
+  #  Associate the public route table with the public subnet in AZ 1
   myPublicSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
@@ -119,8 +117,8 @@ Resources:
       RouteTableId: !Ref myPublicRouteTable
       SubnetId: !Ref myPublicSubnet2
 
-  # ----------------  Step 3 ----------------
-  # a) Specify an Elastic IP (EIP) address for a NAT Gateway in AZ 1
+  
+  #  Specify an Elastic IP (EIP) address for a NAT Gateway in AZ 1
   myEIPforNatGateway1:
     Type: AWS::EC2::EIP
     DependsOn: myVPCGatewayAttachment
@@ -140,7 +138,7 @@ Resources:
       - Key: MasteringCF
         Value:  !Ref paramUniqueName
 
-  # b) Create a NAT Gateway in the public subnet for AZ 1
+  #  Create a NAT Gateway in the public subnet for AZ 1
   myNatGateway1:
     Type: AWS::EC2::NatGateway
     Properties:
@@ -160,7 +158,7 @@ Resources:
       - Key: MasteringCF
         Value:  !Ref paramUniqueName
 
-  # c) Create a private route table for AZ 1
+  #  Create a private route table for AZ 1
   myPrivateRouteTable1:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -178,7 +176,7 @@ Resources:
       - Key: MasteringCF
         Value:  !Ref paramUniqueName
 
-  # d) Associate the private route table with the Nat Gateway in AZ 1
+  #  Associate the private route table with the Nat Gateway in AZ 1
   myPrivateRouteForAz1:
     Type: AWS::EC2::Route
     DependsOn: myVPCGatewayAttachment
@@ -196,7 +194,7 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref myNatGateway2
 
-  # e) Create a private subnet in AZ 1
+  #  Create a private subnet in AZ 1
   myPrivateSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
@@ -220,7 +218,7 @@ Resources:
       - Key: MasteringCF
         Value:  !Ref paramUniqueName
 
-  # f) Associate the private route table with the private subnet in AZ 1
+  #  Associate the private route table with the private subnet in AZ 1
   myPrivateSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
